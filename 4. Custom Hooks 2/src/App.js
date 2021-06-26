@@ -5,32 +5,28 @@ import NewTask from './components/NewTask/NewTask';
 import useHttp from './hooks/use-https';
 
 function App() {
-	const {
-		isLoading,
-		error,
-		sendRequest: fetchTasks,
-	} = useHttp(
-		{
-			url: 'https://react-tut-a0f33-default-rtdb.firebaseio.com/tasks.json',
-		},
-		transformTasks
-	);
+	const { isLoading, error, sendRequest: fetchTasks } = useHttp();
 
 	const [tasks, setTasks] = useState([]);
 
-	function transformTasks(taskObj) {
-		const loadedTasks = [];
+	useEffect(() => {
+		function transformTasks(taskObj) {
+			const loadedTasks = [];
 
-		for (const taskKey in taskObj) {
-			loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
+			for (const taskKey in taskObj) {
+				loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
+			}
+
+			setTasks(loadedTasks);
 		}
 
-		setTasks(loadedTasks);
-	}
-
-	useEffect(() => {
-		fetchTasks();
-	}, []);
+		fetchTasks(
+			{
+				url: 'https://react-tut-a0f33-default-rtdb.firebaseio.com/tasks.json',
+			},
+			transformTasks
+		);
+	}, [fetchTasks]);
 
 	const taskAddHandler = (task) => {
 		setTasks((prevTasks) => prevTasks.concat(task));
